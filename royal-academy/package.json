@@ -12,6 +12,7 @@
   "dependencies": {
     "@base-ui/react": "^1.7.0",
     "@prisma/adapter-better-sqlite3": "^7.9.1",
+    "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "@types/better-sqlite3": "^9.6.0",
     "bcryptjs": "^3.0.3",
@@ -24,6 +25,7 @@
     "lucide-react": "^1.28.0",
     "next": "16.3.0",
     "papaparse": "^5.5.4",
+    "pg": "^8.23.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-papaparse": "^4.4.0",
@@ -38,6 +40,7 @@
     "@types/cookie": "^0.6.0",
     "@types/node": "^20",
     "@types/papaparse": "^5.5.2",
+    "@types/pg": "^8.23.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
