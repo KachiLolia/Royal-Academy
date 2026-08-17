@@ -12,16 +12,16 @@ export async function signToken(payload: any) {
     .sign(key);
 }
 
-export async function verifyToken(token: string) {
+export async function verifyToken(token: string): Promise<{ id: string; role: string; [key: string]: any } | null> {
   try {
     const { payload } = await jwtVerify(token, key);
-    return payload;
+    return payload as { id: string; role: string; [key: string]: any };
   } catch (error) {
     return null;
   }
 }
 
-export async function getSession() {
+export async function getSession(): Promise<{ id: string; role: string; [key: string]: any } | null> {
   const cookieStore = await cookies();
   const session = cookieStore.get('session')?.value;
   if (!session) return null;

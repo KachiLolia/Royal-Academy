@@ -11,7 +11,7 @@ export async function GET(request: Request) {
 
     // Ensure only Admin or Teacher
     const payload = await verifyToken(token);
-    if (payload.role !== 'SUPER_ADMIN' && payload.role !== 'SCHOOL_ADMIN' && payload.role !== 'TEACHER') {
+    if (!payload || (payload.role !== 'SUPER_ADMIN' && payload.role !== 'SCHOOL_ADMIN' && payload.role !== 'TEACHER')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
