@@ -24,13 +24,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
     
-    // Check if the user must change their password
-    const isChangePasswordPage = request.nextUrl.pathname.startsWith('/change-password');
-    if (payload && payload.mustChangePassword && !isChangePasswordPage && !isApiRoute) {
-      const changePasswordUrl = request.nextUrl.clone();
-      changePasswordUrl.pathname = '/change-password';
-      return NextResponse.redirect(changePasswordUrl);
-    }
+
     
     if (payload && isAuthPage) {
       const dashboardUrl = request.nextUrl.clone();
