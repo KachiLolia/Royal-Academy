@@ -7,7 +7,12 @@ export async function GET() {
     const hashedPassword = await bcrypt.hash('password123', 10);
     const user = await prisma.user.upsert({
       where: { email: 'admin@royalacademy.com' },
-      update: {},
+      update: {
+        password: hashedPassword,
+        role: 'SUPER_ADMIN',
+        firstName: 'Super',
+        lastName: 'Admin',
+      },
       create: {
         email: 'admin@royalacademy.com',
         firstName: 'Super',
