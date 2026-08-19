@@ -7,11 +7,16 @@ export async function middleware(request: NextRequest) {
   
   const isAuthPage = request.nextUrl.pathname.startsWith('/login');
   const isApiRoute = request.nextUrl.pathname.startsWith('/api/');
+
+  // Helper to build absolute URL for Railway
+  const getAbsoluteUrl = (pathname: string) => {
+    const host = request.headers.get('x-forwarded-host') || request.nextUrl.host;
+    const protocol = request.headers.get('x-forwarded-proto') || 'https';
+    return `${protocol}://${host}${pathname}`;
+  };
   
   if (!sessionCookie && !isAuthPage && !isApiRoute) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = '/login';
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(getAbsoluteUrl('/login'));
   }
 
   if (sessionCookie) {
@@ -19,17 +24,14 @@ export async function middleware(request: NextRequest) {
     const payload = await verifyToken(sessionCookie.value);
     
     if (!payload && !isAuthPage && !isApiRoute) {
-      const loginUrl = request.nextUrl.clone();
-      loginUrl.pathname = '/login';
-      return NextResponse.redirect(loginUrl);
+      // If token is invalid/expired, clear the cookie and redirect
+      const response = NextResponse.redirect(getAbsoluteUrl('/login'));
+      response.cookies.delete('session');
+      return response;
     }
     
-
-    
     if (payload && isAuthPage) {
-      const dashboardUrl = request.nextUrl.clone();
-      dashboardUrl.pathname = '/dashboard';
-      return NextResponse.redirect(dashboardUrl);
+      return NextResponse.redirect(getAbsoluteUrl('/dashboard'));
     }
   }
   
