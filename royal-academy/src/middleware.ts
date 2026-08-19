@@ -9,7 +9,9 @@ export async function middleware(request: NextRequest) {
   const isApiRoute = request.nextUrl.pathname.startsWith('/api/');
   
   if (!sessionCookie && !isAuthPage && !isApiRoute) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = '/login';
+    return NextResponse.redirect(loginUrl);
   }
 
   if (sessionCookie) {
@@ -17,17 +19,23 @@ export async function middleware(request: NextRequest) {
     const payload = await verifyToken(sessionCookie.value);
     
     if (!payload && !isAuthPage && !isApiRoute) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = '/login';
+      return NextResponse.redirect(loginUrl);
     }
     
     // Check if the user must change their password
     const isChangePasswordPage = request.nextUrl.pathname.startsWith('/change-password');
     if (payload && payload.mustChangePassword && !isChangePasswordPage && !isApiRoute) {
-      return NextResponse.redirect(new URL('/change-password', request.url));
+      const changePasswordUrl = request.nextUrl.clone();
+      changePasswordUrl.pathname = '/change-password';
+      return NextResponse.redirect(changePasswordUrl);
     }
     
     if (payload && isAuthPage) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      const dashboardUrl = request.nextUrl.clone();
+      dashboardUrl.pathname = '/dashboard';
+      return NextResponse.redirect(dashboardUrl);
     }
   }
   
