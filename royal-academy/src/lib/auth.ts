@@ -14,9 +14,12 @@ export async function signToken(payload: any) {
 
 export async function verifyToken(token: string): Promise<{ id: string; role: string; [key: string]: any } | null> {
   try {
-    const { payload } = await jwtVerify(token, key);
+    const { payload } = await jwtVerify(token, key, {
+      clockTolerance: 300 // 5 minutes tolerance for clock skew between Edge and Node environments
+    });
     return payload as { id: string; role: string; [key: string]: any };
   } catch (error) {
+    console.error("JWT Verification failed:", error);
     return null;
   }
 }

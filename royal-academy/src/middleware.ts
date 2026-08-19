@@ -19,20 +19,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(getAbsoluteUrl('/login'));
   }
 
-  if (sessionCookie) {
-    // Note: this verifyToken uses Jose which works in Edge runtime
-    const payload = await verifyToken(sessionCookie.value);
-    
-    if (!payload && !isAuthPage && !isApiRoute) {
-      // If token is invalid/expired, clear the cookie and redirect
-      const response = NextResponse.redirect(getAbsoluteUrl('/login'));
-      response.cookies.delete('session');
-      return response;
-    }
-    
-    if (payload && isAuthPage) {
-      return NextResponse.redirect(getAbsoluteUrl('/dashboard'));
-    }
+  if (sessionCookie && isAuthPage) {
+    // If they have a cookie and try to visit login, send them to dashboard
+    // The actual token verification will happen in the dashboard layout (Node.js runtime)
+    return NextResponse.redirect(getAbsoluteUrl('/dashboard'));
   }
   
   return NextResponse.next();

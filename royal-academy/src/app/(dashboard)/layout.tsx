@@ -4,6 +4,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";
 
+import { redirect } from "next/navigation";
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -20,10 +22,15 @@ export default async function DashboardLayout({
       if (payload) {
         userRole = payload.role as string;
         userEmail = payload.email as string || "User";
+      } else {
+        redirect("/login");
       }
     } catch (e) {
-      console.error(e);
+      console.error("Token verification failed in layout:", e);
+      redirect("/login");
     }
+  } else {
+    redirect("/login");
   }
 
   return (
