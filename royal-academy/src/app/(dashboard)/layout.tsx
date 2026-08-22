@@ -136,9 +136,9 @@ export default async function DashboardLayout({
             <Link href="/profile" className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">
               Profile Settings
             </Link>
-            <Link href="/api/auth/logout" className={buttonVariants({ variant: "outline", size: "sm" })}>
-              Logout
-            </Link>
+            <a href="/api/auth/logout" className={buttonVariants({ variant: "outline", size: "sm" })}>
+              Log out
+            </a>
           </div>
         </header>
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
