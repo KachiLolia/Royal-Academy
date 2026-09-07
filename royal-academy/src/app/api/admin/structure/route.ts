@@ -28,6 +28,23 @@ export async function POST(request: Request) {
       });
       return NextResponse.json({ success: true, data: academicYear });
     } 
+
+    if (type === 'term') {
+      const { name, startDate, endDate, academicYearId, isActive } = data;
+      if (isActive) {
+        await prisma.term.updateMany({ data: { isActive: false } }); 
+      }
+      const term = await prisma.term.create({
+        data: { 
+          name, 
+          startDate: new Date(startDate), 
+          endDate: new Date(endDate), 
+          academicYearId, 
+          isActive: !!isActive 
+        }
+      });
+      return NextResponse.json({ success: true, data: term });
+    }
     
     if (type === 'class') {
       const { name, sections } = data; // sections is an array of strings e.g. ["A", "B"]
@@ -85,6 +102,8 @@ export async function DELETE(request: Request) {
 
     if (type === 'academicYear') {
       await prisma.academicYear.delete({ where: { id } });
+    } else if (type === 'term') {
+      await prisma.term.delete({ where: { id } });
     } else if (type === 'class') {
       await prisma.class.delete({ where: { id } });
     } else if (type === 'subject') {

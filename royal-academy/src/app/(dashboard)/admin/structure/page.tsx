@@ -11,10 +11,14 @@ export default function StructurePage() {
   const [data, setData] = useState<any>({ academicYears: [], classes: [], subjects: [] });
   const [isLoading, setIsLoading] = useState(true);
 
-  // Form states
   const [yearName, setYearName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  
+  const [termName, setTermName] = useState("");
+  const [termStartDate, setTermStartDate] = useState("");
+  const [termEndDate, setTermEndDate] = useState("");
+  const [termAcademicYearId, setTermAcademicYearId] = useState("");
   
   const [className, setClassName] = useState("");
   const [sections, setSections] = useState(""); // comma separated
@@ -79,6 +83,16 @@ export default function StructurePage() {
     handleSubmit("academicYear", { name: yearName, startDate, endDate, isActive: true });
   };
 
+  const submitTerm = () => {
+    handleSubmit("term", { 
+      name: termName, 
+      startDate: termStartDate, 
+      endDate: termEndDate, 
+      academicYearId: termAcademicYearId, 
+      isActive: true 
+    });
+  };
+
   const submitClass = () => {
     const sectionArray = sections.split(",").map(s => s.trim()).filter(Boolean);
     handleSubmit("class", { name: className, sections: sectionArray });
@@ -97,7 +111,7 @@ export default function StructurePage() {
         <p className="text-gray-500">Manage academic years, classes, and subjects.</p>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         {/* ACADEMIC YEAR */}
         <Card>
           <CardHeader>
@@ -135,6 +149,63 @@ export default function StructurePage() {
                     </button>
                   </li>
                 ))}
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* TERM */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Create Term</CardTitle>
+            <CardDescription>Add a term to an academic year.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Academic Year</Label>
+              <select 
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={termAcademicYearId}
+                onChange={(e) => setTermAcademicYearId(e.target.value)}
+              >
+                <option value="">Select Year...</option>
+                {data.academicYears.map((y: any) => (
+                  <option key={y.id} value={y.id}>{y.name}</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label>Term Name (e.g., First Term)</Label>
+              <Input value={termName} onChange={(e) => setTermName(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>Start Date</Label>
+              <Input type="date" value={termStartDate} onChange={(e) => setTermStartDate(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>End Date</Label>
+              <Input type="date" value={termEndDate} onChange={(e) => setTermEndDate(e.target.value)} />
+            </div>
+            <Button onClick={submitTerm} disabled={!termName || !termStartDate || !termEndDate || !termAcademicYearId}>Create Term</Button>
+            
+            <div className="pt-4 mt-4 border-t">
+              <h3 className="font-semibold text-sm mb-2">Existing Terms</h3>
+              <ul className="text-sm space-y-1 max-h-48 overflow-y-auto">
+                {data.academicYears.flatMap((y: any) => 
+                  y.terms?.map((t: any) => (
+                    <li key={t.id} className="flex justify-between items-center group">
+                      <div className="flex flex-col">
+                        <span>{t.name} <span className="text-gray-500 text-xs">({y.name})</span></span>
+                        <span className={`text-xs ${t.isActive ? "text-green-600 font-bold" : "text-gray-400"}`}>
+                          {t.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </div>
+                      <button onClick={() => handleDelete('term', t.id)} className="text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </li>
+                  ))
+                )}
               </ul>
             </div>
           </CardContent>
