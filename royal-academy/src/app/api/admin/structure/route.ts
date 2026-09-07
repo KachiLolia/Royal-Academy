@@ -3,6 +3,20 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
+    // Auto-update terms' active status based on current date
+    const now = new Date();
+    const allTerms = await prisma.term.findMany();
+    
+    for (const term of allTerms) {
+      const isCurrentlyActive = now >= term.startDate && now <= term.endDate;
+      if (term.isActive !== isCurrentlyActive) {
+        await prisma.term.update({
+          where: { id: term.id },
+          data: { isActive: isCurrentlyActive }
+        });
+      }
+    }
+
     const academicYears = await prisma.academicYear.findMany({ include: { terms: true } });
     const classes = await prisma.class.findMany({ include: { sections: true, subjectAssignments: true } });
     const subjects = await prisma.subject.findMany();
@@ -30,17 +44,22 @@ export async function POST(request: Request) {
     } 
 
     if (type === 'term') {
-      const { name, startDate, endDate, academicYearId, isActive } = data;
-      if (isActive) {
+      const { name, startDate, endDate, academicYearId } = data;
+      const now = new Date();
+      const sDate = new Date(startDate);
+      const eDate = new Date(endDate);
+      const isCurrentlyActive = now >= sDate && now <= eDate;
+
+      if (isCurrentlyActive) {
         await prisma.term.updateMany({ data: { isActive: false } }); 
       }
       const term = await prisma.term.create({
         data: { 
           name, 
-          startDate: new Date(startDate), 
-          endDate: new Date(endDate), 
+          startDate: sDate, 
+          endDate: eDate, 
           academicYearId, 
-          isActive: !!isActive 
+          isActive: isCurrentlyActive 
         }
       });
       return NextResponse.json({ success: true, data: term });

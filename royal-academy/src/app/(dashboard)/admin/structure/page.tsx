@@ -88,8 +88,7 @@ export default function StructurePage() {
       name: termName, 
       startDate: termStartDate, 
       endDate: termEndDate, 
-      academicYearId: termAcademicYearId, 
-      isActive: true 
+      academicYearId: termAcademicYearId
     });
   };
 
