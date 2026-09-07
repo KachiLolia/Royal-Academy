@@ -47,34 +47,39 @@ export async function POST(request: Request) {
     }
 
     const { termId, classId } = await request.json();
-    if (!termId || !classId) {
-      return NextResponse.json({ error: 'Missing termId or classId' }, { status: 400 });
+    if (!termId) {
+      return NextResponse.json({ error: 'Missing termId' }, { status: 400 });
     }
 
-    // Find all active students in the class
-    const students = await prisma.student.findMany({
-      where: { classId }
-    });
+    // Find all active students (filtered by class if classId is provided)
+    const students = classId 
+      ? await prisma.student.findMany({ where: { classId } })
+      : await prisma.student.findMany();
 
-    // Find all applicable fees (global or specific to this class) for the term
-    const fees = await prisma.feeStructure.findMany({
-      where: {
-        termId,
-        OR: [
-          { classId: null },
-          { classId: classId }
-        ]
-      }
-    });
+    // Find all applicable fees for the term
+    const fees = classId
+      ? await prisma.feeStructure.findMany({
+          where: {
+            termId,
+            OR: [
+              { classId: null },
+              { classId: classId }
+            ]
+          }
+        })
+      : await prisma.feeStructure.findMany({ where: { termId } });
 
     if (fees.length === 0) {
-      return NextResponse.json({ error: 'No fee structures found for this term and class' }, { status: 400 });
+      return NextResponse.json({ error: 'No fee structures found for this selection' }, { status: 400 });
     }
 
     let createdCount = 0;
 
     for (const student of students) {
-      for (const fee of fees) {
+      // Filter fees applicable specifically to this student
+      const studentFees = fees.filter(f => f.classId === null || f.classId === student.classId);
+
+      for (const fee of studentFees) {
         // Upsert to prevent duplicate invoices for the same fee structure
         const existing = await prisma.studentFee.findUnique({
           where: {

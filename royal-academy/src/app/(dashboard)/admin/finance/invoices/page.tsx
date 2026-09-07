@@ -80,8 +80,8 @@ export default function InvoicesPage() {
   };
 
   const handleGenerateInvoices = async () => {
-    if (!selectedTerm || !selectedClass) {
-      alert("Please select a term and a class to generate invoices for.");
+    if (!selectedTerm) {
+      alert("Please select a term to generate invoices for.");
       return;
     }
     
@@ -147,9 +147,9 @@ export default function InvoicesPage() {
           <h1 className="text-2xl font-bold tracking-tight">Invoices & Payments</h1>
           <p className="text-gray-500">Manage student billing and record manual payments.</p>
         </div>
-        <Button onClick={handleGenerateInvoices} disabled={isGenerating || !selectedTerm || !selectedClass} className="flex gap-2">
+        <Button onClick={handleGenerateInvoices} disabled={isGenerating || !selectedTerm} className="flex gap-2">
           <FileText className="w-4 h-4" />
-          {isGenerating ? "Generating..." : "Generate Invoices for Class"}
+          {isGenerating ? "Generating..." : (selectedClass ? "Generate Invoices for Class" : "Generate Invoices for All")}
         </Button>
       </div>
 
